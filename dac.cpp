@@ -2,7 +2,7 @@
 #include "iRecHS2s.h"
 
 
-#define USE_DACONVERTER
+//#define USE_DACONVERTER
 
 #ifdef USE_DACONVERTER
 #pragma comment(lib, "caio.lib")
