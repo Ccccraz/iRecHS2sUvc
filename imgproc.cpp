@@ -876,7 +876,7 @@ int EyeImage::CalcEllipseShapeX(void)
 
 	int ang[181];
 	int num, max, miss_num;
-	int ynum;
+	int ynum{};
 	double dangle_sum, dangle_pos, dangle_num;
 	pe.Set(ci.w, ci.h);
 	length = 0;
