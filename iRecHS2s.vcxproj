@@ -160,7 +160,6 @@
     <ClInclude Include="iRecClass.h" />
     <ClInclude Include="iRecHS2s.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="SpinnakerCameraClass.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="WinCtrls.h" />
   </ItemGroup>
@@ -178,7 +177,6 @@
     <ClCompile Include="objectmap.cpp" />
     <ClCompile Include="options.cpp" />
     <ClCompile Include="pos2gaze.cpp" />
-    <ClCompile Include="SpinnakerCameraClass.cpp" />
     <ClCompile Include="timeline.cpp" />
     <ClCompile Include="WinCtrls.cpp" />
     <ClCompile Include="XYGraph.cpp" />
@@ -189,10 +187,6 @@
   <ItemGroup>
     <Image Include="iRecHS2s.ico" />
     <Image Include="small.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram.cd" />
-    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
