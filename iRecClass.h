@@ -451,7 +451,7 @@ public:
 	iRec();
 	~iRec();
 
-	SpinnakerCamera cam;
+	UvcCamera cam;
 
 	LARGE_INTEGER CPU_StartFreqCount;
 	LARGE_INTEGER CPU_Freq;

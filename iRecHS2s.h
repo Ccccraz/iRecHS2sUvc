@@ -3,7 +3,7 @@
 #include "resource.h"
 #include "DlgCtrls.h"
 #include "WinCtrls.h"
-#include "SpinnakerCameraClass.h"
+#include "UvcCamera.h"
 
 #include "imgproc.h"
 #include "eyedata.h"

@@ -12,7 +12,7 @@ using namespace boost::archive;
 
 struct iRecParam {
 	ImgProc_Parameter ipp;
-	SPINNAKER_CAMERA_PARAM scscp;
+	UVC_CAMERA_PARAM scscp;
 	CameraView_Parameter cvp;
 	Calibration_Parameter cp;
 	Output_Parameter op;
