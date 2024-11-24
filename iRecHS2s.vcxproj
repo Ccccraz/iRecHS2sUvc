@@ -129,7 +129,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Spinnakerd_v140.lib;shlwapi.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shlwapi.lib;comctl32.lib;uvc.lib;turbojpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -179,6 +179,7 @@
     <ClCompile Include="options.cpp" />
     <ClCompile Include="pos2gaze.cpp" />
     <ClCompile Include="timeline.cpp" />
+    <ClCompile Include="UvcCamera.cpp" />
     <ClCompile Include="WinCtrls.cpp" />
     <ClCompile Include="XYGraph.cpp" />
   </ItemGroup>
