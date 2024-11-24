@@ -130,45 +130,45 @@ auto UvcCamera::SetCamera(const unsigned int no) -> bool
 	if (res != UVC_SUCCESS) ErrorProc(res, L"SetCamera get device info");
 
 
-	GetCameraParameter(uvc_cam_param);
+	GetCameraParameter(CameraParam);
 	uvc_cam_serial = std::string(uvc_cam_desc->serialNumber);
-	uvc_cam_param.w = MaxWidth();
-	uvc_cam_param.h = MaxHeight();
+	CameraParam.w = MaxWidth();
+	CameraParam.h = MaxHeight();
 
 	// TODO: Implement
-	uvc_cam_param.ExposureMode = std::string("Timed");
-	uvc_cam_param.ExposureAuto = string("On");
-	uvc_cam_param.ExposureTime = 1000;
+	CameraParam.ExposureMode = std::string("Timed");
+	CameraParam.ExposureAuto = string("On");
+	CameraParam.ExposureTime = 1000;
 
-	uvc_cam_param.BinningSelector = std::string("All");
-	uvc_cam_param.BinningH = 1;
-	uvc_cam_param.BinningV = 1;
-	uvc_cam_param.OffsetX = 0;
-	uvc_cam_param.OffsetY = 0;
+	CameraParam.BinningSelector = std::string("All");
+	CameraParam.BinningH = 1;
+	CameraParam.BinningV = 1;
+	CameraParam.OffsetX = 0;
+	CameraParam.OffsetY = 0;
 
-	uvc_cam_param.GainAuto = string("Off");;
-	uvc_cam_param.Gain = 0;
-	uvc_cam_param.BlackLevelSelector = string("All");
-	uvc_cam_param.BlackLevel = 0;
+	CameraParam.GainAuto = string("Off");;
+	CameraParam.Gain = 0;
+	CameraParam.BlackLevelSelector = string("All");
+	CameraParam.BlackLevel = 0;
 
-	uvc_cam_param.GammaEnable = true;
-	uvc_cam_param.Gamma = 1;
+	CameraParam.GammaEnable = true;
+	CameraParam.Gamma = 1;
 
 	// uvc camera doesn't have these properties
 	// so hardcode some fake values
-	uvc_cam_param.StreamBufferHandlingMode = std::string("NewestOnly");
-	uvc_cam_param.StreamBufferCountMode = std::string("Manual");
-	uvc_cam_param.StreamBufferCount = 10;
-	uvc_cam_param.AdcBitDepth = std::string("Bit8");
-	uvc_cam_param.PixelFormat = std::string("Mono8");
-	uvc_cam_param.AcquisitionMode = std::string("Continuous");
-	uvc_cam_param.AcquisitionFrameRateEnable = true;
-	uvc_cam_param.AcquisitionFrameRateAuto = std::string("Continuous");
-	uvc_cam_param.AcquisitionFrameRate = 30.0;
-	uvc_cam_param.pgrExposureCompensationAuto = std::string("Continuous");
-	uvc_cam_param.pgrExposureCompensation = 0;
+	CameraParam.StreamBufferHandlingMode = std::string("NewestOnly");
+	CameraParam.StreamBufferCountMode = std::string("Manual");
+	CameraParam.StreamBufferCount = 10;
+	CameraParam.AdcBitDepth = std::string("Bit8");
+	CameraParam.PixelFormat = std::string("Mono8");
+	CameraParam.AcquisitionMode = std::string("Continuous");
+	CameraParam.AcquisitionFrameRateEnable = true;
+	CameraParam.AcquisitionFrameRateAuto = std::string("Continuous");
+	CameraParam.AcquisitionFrameRate = 30.0;
+	CameraParam.pgrExposureCompensationAuto = std::string("Continuous");
+	CameraParam.pgrExposureCompensation = 0;
 
-	SetCameraParameter(uvc_cam_param);
+	SetCameraParameter(CameraParam);
 
 	Start();
 
@@ -1054,24 +1054,24 @@ INT_PTR UvcCamera::InputRegion::Open(HWND hWnd, UvcCamera& pcam)
 	w.max = static_cast<int>(320);
 	w.min = static_cast<int>(320);
 	w.inc = static_cast<int>(1);
-	w.val = CamPtr->uvc_cam_param.w;
+	w.val = CamPtr->CameraParam.w;
 
 
 	h.max = static_cast<int>(240);
 	h.min = static_cast<int>(240);
 	h.inc = static_cast<int>(1);
-	h.val = CamPtr->uvc_cam_param.h;
+	h.val = CamPtr->CameraParam.h;
 
 
 	offx.inc = static_cast<int>(1);
 	offx.min = static_cast<int>(0);
 	offx.max = w.max - w.min;
-	offx.val = CamPtr->uvc_cam_param.OffsetX;
+	offx.val = CamPtr->CameraParam.OffsetX;
 
 	offy.inc = static_cast<int>(1);
 	offy.min = static_cast<int>(0);
 	offy.max = h.max - h.min;
-	offy.val = CamPtr->uvc_cam_param.OffsetY;
+	offy.val = CamPtr->CameraParam.OffsetY;
 
 	ReductionRatio = static_cast<int>(ceil(static_cast<double>(w.max) / 1000.0));
 
@@ -1185,10 +1185,10 @@ BOOL UvcCamera::InputRegion::DlgProc(HWND hDlg, UINT message, WPARAM wParam, LPA
 		switch (wmId)
 		{
 		case IDOK:
-			CamPtr->uvc_cam_param.w = sp_width->Get();
-			CamPtr->uvc_cam_param.h = sp_height->Get();
-			CamPtr->uvc_cam_param.OffsetX = sp_offsetx->Get();
-			CamPtr->uvc_cam_param.OffsetY = sp_offsety->Get();
+			CamPtr->CameraParam.w = sp_width->Get();
+			CamPtr->CameraParam.h = sp_height->Get();
+			CamPtr->CameraParam.OffsetX = sp_offsetx->Get();
+			CamPtr->CameraParam.OffsetY = sp_offsety->Get();
 
 			EndCtrl(hDlg);
 			return EndDialog(hDlg, wmId);
@@ -1232,22 +1232,22 @@ auto UvcCamera::DialogRegion(HWND hWnd) -> bool
 	bool result = false;
 	InputRegion ir;
 	if (!IsReady()) return result;
-	GetCameraParameter(uvc_cam_param);
+	GetCameraParameter(CameraParam);
 	if (hWnd == NULL)
 	{
-		if (uvc_cam_param.w > INIT_INPUT_W)
+		if (CameraParam.w > INIT_INPUT_W)
 		{
-			uvc_cam_param.w = INIT_INPUT_W;
+			CameraParam.w = INIT_INPUT_W;
 		}
-		if (uvc_cam_param.h > INIT_INPUT_H)
+		if (CameraParam.h > INIT_INPUT_H)
 		{
-			uvc_cam_param.h = INIT_INPUT_H;
+			CameraParam.h = INIT_INPUT_H;
 		}
 	}
 	// TODO:
 	SetFullScreen();
 	result = ir.Open(hWnd, *this);
-	SetCameraParameter(uvc_cam_param);
+	SetCameraParameter(CameraParam);
 	return result;
 }
 
@@ -1414,8 +1414,8 @@ void UvcCamera::Parameters::InitCtrl(HWND hDlg)
 
 	// Get camera parameters
 	/// TODO: Get camera parameters from camera
-	cam_w = CamPtr->uvc_cam_param.w;
-	cam_h = CamPtr->uvc_cam_param.h;
+	cam_w = CamPtr->CameraParam.w;
+	cam_h = CamPtr->CameraParam.h;
 	cam_x = CAMPARAM_BMP_OFFSETX;
 	cam_y = CAMPARAM_BMP_OFFSETY;
 
@@ -1704,13 +1704,13 @@ auto UvcCamera::DialogParameters(HWND hWnd) -> bool
 	Parameters param;
 	if (!IsReady()) return result;
 
-	GetCameraParameter(uvc_cam_param);
+	GetCameraParameter(CameraParam);
 	result = param.Open(hWnd, *this);
 	if (result == IDCANCEL)
 	{
-		SetCameraParameter(uvc_cam_param);
+		SetCameraParameter(CameraParam);
 	}
-	GetCameraParameter(uvc_cam_param);
+	GetCameraParameter(CameraParam);
 
 	return result;
 }

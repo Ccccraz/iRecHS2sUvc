@@ -268,7 +268,7 @@ public:
 	int should_detach_kernel_driver{0};
 
 	// configuration structure for iRec
-	UVC_CAMERA_PARAM uvc_cam_param;
+	UVC_CAMERA_PARAM CameraParam;
 
 	UvcCamera();
 	~UvcCamera();
