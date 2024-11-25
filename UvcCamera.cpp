@@ -274,7 +274,10 @@ auto UvcCamera::IsOpen() const -> bool
 /// <returns></returns>
 auto UvcCamera::CaptureImage(CameraImage& ci, const std::wstring& wstr) const -> bool
 {
-	uvc_frame_t* frame_raw{nullptr};
+	using nanoseconds = std::chrono::nanoseconds;
+	using steady_clock = std::chrono::steady_clock;
+
+	uvc_frame_t* frame_raw{ nullptr };
 
 	// try to get a frame from the stream and store it in frame_raw. never timeout.
 	const auto res = uvc_stream_get_frame(stream_handle, &frame_raw, 0);
@@ -291,17 +294,21 @@ auto UvcCamera::CaptureImage(CameraImage& ci, const std::wstring& wstr) const ->
 	// Get high-precision system timestamp
 	QueryPerformanceCounter(&ci.CPU_FreqCount);
 
+	// TODO: confirm the timestamp unit is nanoseconds currently use std::chrono library to get the current timestamp as a substitute
+	// TODO: try to get timestamp from frame_raw
+	ci.TimeStamp = std::chrono::duration_cast<nanoseconds>(steady_clock::now().time_since_epoch()).count();
 	ci.FrameID = frame_raw->sequence;
-
-	/// TODO: confirm timestamp format
-	ci.TimeStamp = frame_raw->capture_time.tv_usec;
-
 
 	std::unique_ptr<unsigned char[]> frame_gray{};
 	int width{};
 	int height{};
 
-	auto res_gray = Mjpeg2Gray8(frame_raw, frame_gray, width, height);
+	// convert mjpeg to gray8
+	const auto res_gray = Mjpeg2Gray8(frame_raw, frame_gray, width, height);
+	if (!res_gray)
+	{
+		ErrorProc(UVC_ERROR_OTHER, L"Convert mjpeg to gray8 failed");
+	}
 
 	const auto wh = width * height;
 
@@ -319,7 +326,6 @@ auto UvcCamera::CaptureImage(CameraImage& ci, const std::wstring& wstr) const ->
 		ci.img = new unsigned char[static_cast<size_t>(wh * pbits / 8)];
 	}
 
-	// TODO: source size is not equal to destination size, need to convert
 	memcpy_s(ci.img, wh, frame_gray.get(), wh);
 
 	return true;
@@ -350,13 +356,13 @@ auto UvcCamera::Start() -> bool
 	// Get the stream control
 	const auto frame_desc = uvc_get_format_descs(uvc_cam_handle)->frame_descs;
 
-	constexpr auto frame_format{UVC_COLOR_FORMAT_MJPEG};
-	const uint16_t width{static_cast<uint16_t>(MaxWidth())};
-	const uint16_t height{static_cast<uint16_t>(MaxHeight())};
-	constexpr uint16_t fps{120};
+	constexpr auto frame_format{ UVC_COLOR_FORMAT_MJPEG };
+	const uint16_t width{ static_cast<uint16_t>(MaxWidth()) };
+	const uint16_t height{ static_cast<uint16_t>(MaxHeight()) };
+	constexpr uint16_t fps{ 120 };
 
 	auto res = uvc_get_stream_ctrl_format_size(uvc_cam_handle, &ctrl, frame_format, width, height, fps,
-	                                           should_detach_kernel_driver);
+		should_detach_kernel_driver);
 	if (res != UVC_SUCCESS) return false;
 
 	// Create a stream handle
@@ -420,7 +426,7 @@ auto UvcCamera::MaxHeight() const -> int
 /// <param name="height"> height of the frame</param>
 /// <returns> true if successful </returns>
 auto UvcCamera::Mjpeg2Gray8(const uvc_frame_t* frame, std::unique_ptr<unsigned char[]>& frame_gray, int& width,
-                            int& height) -> bool
+	int& height) -> bool
 {
 	const tjhandle handle = tjInitDecompress();
 	if (!handle)
@@ -434,7 +440,7 @@ auto UvcCamera::Mjpeg2Gray8(const uvc_frame_t* frame, std::unique_ptr<unsigned c
 
 	// Get the dimensions of the image.
 	if (tjDecompressHeader3(handle, static_cast<const unsigned char*>(frame->data), frame->data_bytes, &width, &height,
-	                        &jpeg_subsamp, &jpeg_colorspace) != 0)
+		&jpeg_subsamp, &jpeg_colorspace) != 0)
 	{
 		std::cerr << "Error reading JPEG header: " << tjGetErrorStr2(handle) << '\n';
 		tjDestroy(handle);
@@ -447,7 +453,7 @@ auto UvcCamera::Mjpeg2Gray8(const uvc_frame_t* frame, std::unique_ptr<unsigned c
 
 	// Decompress the JPEG image to grayscale.
 	if (tjDecompress2(handle, static_cast<const unsigned char*>(frame->data), frame->data_bytes, frame_gray.get(),
-	                  width, 0, height, TJPF_GRAY, TJFLAG_FASTDCT) != 0)
+		width, 0, height, TJPF_GRAY, 0) != 0)
 	{
 		std::cerr << "Decode failed: " << tjGetErrorStr2(handle) << '\n';
 		tjDestroy(handle);
@@ -504,8 +510,8 @@ auto UvcCamera::DlgSelect::SetCameraList() -> bool
 	UVC_CAMERA_DATA camera_data{}; // camera data
 
 	// Initialize libuvc
-	uvc_context_t* uvc_context{nullptr};
-	uvc_device_t** devs{nullptr};
+	uvc_context_t* uvc_context{ nullptr };
+	uvc_device_t** devs{ nullptr };
 
 	// clear camera list
 	CameraListVector.clear();
@@ -631,7 +637,7 @@ auto UvcCamera::DlgSelect::DlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARA
 		// Initialize dialog controls
 		if (InitCtrl(hDlg)) return (INT_PTR)true;
 
-	// Close dialog if initialization failed
+		// Close dialog if initialization failed
 		EndDialog(hDlg, false);
 		return (INT_PTR)true;
 
@@ -650,7 +656,7 @@ auto UvcCamera::DlgSelect::DlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARA
 			// Open the selected camera
 			CamPtr->SetCamera(camIndex);
 
-		// Close the dialog
+			// Close the dialog
 			EndCtrl(hDlg);
 			EndDialog(hDlg, true);
 			return (INT_PTR)true;
@@ -658,10 +664,10 @@ auto UvcCamera::DlgSelect::DlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARA
 			EndCtrl(hDlg);
 			EndDialog(hDlg, false);
 			return (INT_PTR)true;
-		default: ;
+		default:;
 		}
 		return (INT_PTR)false;
-	default: ;
+	default:;
 	}
 	return false;
 }
@@ -678,7 +684,7 @@ auto UvcCamera::DlgSelect::DlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARA
 /// <returns></returns>
 auto UvcCamera::DlgSelect::CallbackProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) -> INT_PTR
 {
-	DlgSelect* thisPtr{nullptr};
+	DlgSelect* thisPtr{ nullptr };
 
 	switch (message)
 	{
@@ -954,7 +960,7 @@ UvcCamera::InputRegion::InputRegion()
 	hCursorSIZENESW = LoadCursor(nullptr, IDC_SIZENESW);
 	hCursorSIZENWSE = LoadCursor(nullptr, IDC_SIZENWSE);
 	hCursorArrow = LoadCursor(nullptr, IDC_ARROW);
-	start = {0, 0};
+	start = { 0, 0 };
 	end = start;
 	bmp.reset();
 	btn_OK.reset();
@@ -1615,7 +1621,7 @@ BOOL UvcCamera::Parameters::DlgProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
 				eb_ExposureTime->hWnd == GetFocus() ||
 				eb_Gain->hWnd == GetFocus() ||
 				eb_BlackLevel->hWnd == GetFocus()
-			)
+				)
 			{
 				PostMessage(hDlg, WM_NEXTDLGCTL, 0, 0L);
 				return true;

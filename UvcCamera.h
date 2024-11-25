@@ -14,6 +14,7 @@
 #include <mutex>
 #include <thread>
 #include "DlgCtrls.h"
+#include <chrono>
 
 using namespace std;
 #define EyeImageArray 1000
