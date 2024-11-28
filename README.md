@@ -21,4 +21,4 @@ cmake --build ..
 依旧是由于 pupillab 的 cmake 设置问题, 需要手动将将生成的 `iRecHS2sUvc.vcxproj` 文件中多余到源文件删掉, 基本上是从行 412 开始, 10 行左右
 
 ### License
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project uses the same license as [iRecHS2s](https://staff.aist.go.jp/k.matsuda/iRecHS2/index_e.html).
