@@ -1,0 +1,12 @@
+{
+  "dependencies": [
+    "boost-filesystem",
+    "boost-foreach",
+    "boost-format",
+    "boost-serialization",
+    "libjpeg-turbo",
+    "libusb",
+    "pthreads",
+    "boost-asio"
+  ]
+}

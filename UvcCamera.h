@@ -1,5 +1,4 @@
 #pragma once
-#define WIN32
 #include "framework.h"
 #include <libuvc/libuvc.h>
 #include <turbojpeg.h>
